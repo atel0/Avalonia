@@ -19,7 +19,7 @@ namespace Avalonia
         /// <param name="priority">The priority of the value.</param>
         /// <param name="oldValue">The old value.</param>
         /// <param name="newValue">The new value.</param>
-        void Changed(AvaloniaProperty property, int priority, object oldValue, object newValue);
+        void Changed(AvaloniaProperty property, BindingPriority priority, object oldValue, object newValue);
 
         /// <summary>
         /// Called when a <see cref="BindingNotification"/> is received by a 

@@ -24,12 +24,12 @@ namespace Avalonia
     /// <see cref="IPriorityValueOwner.Changed"/> method on the 
     /// owner object is fired with the old and new values.
     /// </remarks>
-    internal sealed class PriorityValue : ISetAndNotifyHandler<(object,int)>
+    internal sealed class PriorityValue : ISetAndNotifyHandler<(object, BindingPriority)>
     {
         private readonly Type _valueType;
-        private readonly SingleOrDictionary<int, PriorityLevel> _levels = new SingleOrDictionary<int, PriorityLevel>();
+        private readonly SingleOrDictionary<BindingPriority, PriorityLevel> _levels = new SingleOrDictionary<BindingPriority, PriorityLevel>();
         private readonly Func<object, object> _validate;
-        private (object value, int priority) _value;
+        private (object value, BindingPriority priority) _value;
         private DeferredSetter<object> _setter;
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace Avalonia
             Owner = owner;
             Property = property;
             _valueType = valueType;
-            _value = (AvaloniaProperty.UnsetValue, int.MaxValue);
+            _value = (AvaloniaProperty.UnsetValue, BindingPriority.Unset);
             _validate = validate;
         }
 
@@ -59,7 +59,7 @@ namespace Avalonia
         {
             get
             {
-                return ValuePriority <= (int)BindingPriority.Animation && 
+                return ValuePriority <= BindingPriority.Animation && 
                     GetLevel(ValuePriority).ActiveBindingIndex != -1;
             }
         }
@@ -82,7 +82,7 @@ namespace Avalonia
         /// <summary>
         /// Gets the priority of the binding that is currently active.
         /// </summary>
-        public int ValuePriority => _value.priority;
+        public BindingPriority ValuePriority => _value.priority;
 
         /// <summary>
         /// Adds a new binding.
@@ -92,7 +92,7 @@ namespace Avalonia
         /// <returns>
         /// A disposable that will remove the binding.
         /// </returns>
-        public IDisposable Add(IObservable<object> binding, int priority)
+        public IDisposable Add(IObservable<object> binding, BindingPriority priority)
         {
             return GetLevel(priority).Add(binding);
         }
@@ -102,7 +102,7 @@ namespace Avalonia
         /// </summary>
         /// <param name="value">The value.</param>
         /// <param name="priority">The priority</param>
-        public void SetValue(object value, int priority)
+        public void SetValue(object value, BindingPriority priority)
         {
             GetLevel(priority).DirectValue = value;
         }
@@ -185,7 +185,7 @@ namespace Avalonia
                         }
                     }
 
-                    UpdateValue(AvaloniaProperty.UnsetValue, int.MaxValue);
+                    UpdateValue(AvaloniaProperty.UnsetValue, BindingPriority.Unset);
                 }
             }
         }
@@ -222,7 +222,7 @@ namespace Avalonia
         /// </summary>
         /// <param name="priority">The priority.</param>
         /// <returns>The priority level.</returns>
-        private PriorityLevel GetLevel(int priority)
+        private PriorityLevel GetLevel(BindingPriority priority)
         {
             PriorityLevel result;
 
@@ -240,7 +240,7 @@ namespace Avalonia
         /// </summary>
         /// <param name="value">The value to set.</param>
         /// <param name="priority">The priority level that the value came from.</param>
-        private void UpdateValue(object value, int priority)
+        private void UpdateValue(object value, BindingPriority priority)
         {
             var newValue = (value, priority);
 
@@ -257,12 +257,17 @@ namespace Avalonia
             _setter.SetAndNotifyCallback(Property, this, ref _value, newValue);
         }
 
-        void ISetAndNotifyHandler<(object, int)>.HandleSetAndNotify(AvaloniaProperty property, ref (object, int) backing, (object, int) value)
+        void ISetAndNotifyHandler<(object, BindingPriority)>.HandleSetAndNotify(
+            AvaloniaProperty property,
+            ref (object, BindingPriority) backing,
+            (object, BindingPriority) value)
         {
             SetAndNotify(ref backing, value);
         }
 
-        private void SetAndNotify(ref (object value, int priority) backing, (object value, int priority) update)
+        private void SetAndNotify(
+            ref (object value, BindingPriority priority) backing,
+            (object value, BindingPriority priority) update)
         {
             var val = update.value;
             var notification = val as BindingNotification;

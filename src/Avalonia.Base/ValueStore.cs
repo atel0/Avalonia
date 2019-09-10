@@ -42,10 +42,10 @@ namespace Avalonia
                 _propertyValues.AddValue(property, priorityValue);
             }
 
-            return priorityValue.Add(source, (int)priority);
+            return priorityValue.Add(source, priority);
         }
 
-        public void AddValue(AvaloniaProperty property, object value, int priority)
+        public void AddValue(AvaloniaProperty property, object value, BindingPriority priority)
         {
             PriorityValue priorityValue;
 
@@ -97,7 +97,7 @@ namespace Avalonia
             _owner.BindingNotificationReceived(property, notification);
         }
 
-        public void Changed(AvaloniaProperty property, int priority, object oldValue, object newValue)
+        public void Changed(AvaloniaProperty property, BindingPriority priority, object oldValue, object newValue)
         {
             _owner.PriorityValueChanged(property, priority, oldValue, newValue);
         }

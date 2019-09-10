@@ -1,6 +1,7 @@
 // Copyright (c) The Avalonia Project. All rights reserved.
 // Licensed under the MIT license. See licence.md file in the project root for full license information.
 
+using Avalonia.Data;
 using Avalonia.Utilities;
 using Moq;
 using System;
@@ -32,7 +33,7 @@ namespace Avalonia.Base.UnitTests
         {
             var target = new PriorityValue(GetMockOwner().Object, TestProperty, typeof(string));
 
-            target.Add(Single("foo"), 0);
+            target.Add(Single("foo"), BindingPriority.LocalValue);
 
             Assert.Equal("foo", target.Value);
         }
@@ -43,7 +44,7 @@ namespace Avalonia.Base.UnitTests
             var target = new PriorityValue(GetMockOwner().Object, TestProperty, typeof(string));
             var subject = new BehaviorSubject<string>("foo");
 
-            target.Add(subject, 0);
+            target.Add(subject, BindingPriority.LocalValue);
             Assert.Equal("foo", target.Value);
             subject.OnNext("bar");
             Assert.Equal("bar", target.Value);
@@ -54,8 +55,8 @@ namespace Avalonia.Base.UnitTests
         {
             var target = new PriorityValue(GetMockOwner().Object, TestProperty, typeof(string));
 
-            target.Add(Single("foo"), 0);
-            target.SetValue("bar", 0);
+            target.Add(Single("foo"), BindingPriority.LocalValue);
+            target.SetValue("bar", BindingPriority.LocalValue);
 
             Assert.Equal("bar", target.Value);
         }
@@ -66,9 +67,9 @@ namespace Avalonia.Base.UnitTests
             var target = new PriorityValue(GetMockOwner().Object, TestProperty, typeof(string));
             var source = new BehaviorSubject<object>("initial");
 
-            target.Add(source, 0);
+            target.Add(source, BindingPriority.LocalValue);
             Assert.Equal("initial", target.Value);
-            target.SetValue("first", 0);
+            target.SetValue("first", BindingPriority.LocalValue);
             Assert.Equal("first", target.Value);
             source.OnNext("second");
             Assert.Equal("second", target.Value);
@@ -81,10 +82,10 @@ namespace Avalonia.Base.UnitTests
             var nonActive = new BehaviorSubject<object>("na");
             var source = new BehaviorSubject<object>("initial");
 
-            target.Add(nonActive, 1);
-            target.Add(source, 1);
+            target.Add(nonActive, BindingPriority.StyleTrigger);
+            target.Add(source, BindingPriority.StyleTrigger);
             Assert.Equal("initial", target.Value);
-            target.SetValue("first", 1);
+            target.SetValue("first", BindingPriority.StyleTrigger);
             Assert.Equal("first", target.Value);
             nonActive.OnNext("second");
             Assert.Equal("first", target.Value);
@@ -96,9 +97,9 @@ namespace Avalonia.Base.UnitTests
             var target = new PriorityValue(GetMockOwner().Object, TestProperty, typeof(string));
             var source = new BehaviorSubject<object>("initial");
 
-            target.Add(source, 0);
+            target.Add(source, BindingPriority.LocalValue);
             Assert.Equal("initial", target.Value);
-            target.SetValue("first", 0);
+            target.SetValue("first", BindingPriority.LocalValue);
             Assert.Equal("first", target.Value);
             source.OnNext("second");
             Assert.Equal("second", target.Value);
@@ -111,9 +112,9 @@ namespace Avalonia.Base.UnitTests
         {
             var target = new PriorityValue(GetMockOwner().Object, TestProperty, typeof(string));
 
-            target.Add(Single("foo"), 1);
-            target.Add(Single("bar"), 0);
-            target.Add(Single("baz"), 1);
+            target.Add(Single("foo"), BindingPriority.StyleTrigger);
+            target.Add(Single("bar"), BindingPriority.LocalValue);
+            target.Add(Single("baz"), BindingPriority.StyleTrigger);
 
             Assert.Equal("bar", target.Value);
         }
@@ -123,10 +124,10 @@ namespace Avalonia.Base.UnitTests
         {
             var target = new PriorityValue(GetMockOwner().Object, TestProperty, typeof(string));
 
-            target.Add(Single("foo"), 1);
-            target.Add(Single("bar"), 0);
-            target.Add(Single("baz"), 0);
-            target.Add(Single("qux"), 1);
+            target.Add(Single("foo"), BindingPriority.StyleTrigger);
+            target.Add(Single("bar"), BindingPriority.LocalValue);
+            target.Add(Single("baz"), BindingPriority.LocalValue);
+            target.Add(Single("qux"), BindingPriority.StyleTrigger);
 
             Assert.Equal("baz", target.Value);
         }
@@ -137,8 +138,8 @@ namespace Avalonia.Base.UnitTests
             var target = new PriorityValue(GetMockOwner().Object, TestProperty, typeof(string));
             var subject = new BehaviorSubject<string>("bar");
 
-            target.Add(Single("foo"), 0);
-            target.Add(subject, 1);
+            target.Add(Single("foo"), BindingPriority.LocalValue);
+            target.Add(subject, BindingPriority.StyleTrigger);
             Assert.Equal("foo", target.Value);
             subject.OnNext("baz");
             Assert.Equal("foo", target.Value);
@@ -150,8 +151,8 @@ namespace Avalonia.Base.UnitTests
             var target = new PriorityValue(GetMockOwner().Object, TestProperty, typeof(string));
             var subject = new BehaviorSubject<object>("bar");
 
-            target.Add(subject, 0);
-            target.Add(Single("foo"), 1);
+            target.Add(subject, BindingPriority.LocalValue);
+            target.Add(Single("foo"), BindingPriority.StyleTrigger);
 
             Assert.Equal("bar", target.Value);
 
@@ -166,7 +167,7 @@ namespace Avalonia.Base.UnitTests
             var owner = GetMockOwner();
             var target = new PriorityValue(owner.Object, TestProperty, typeof(string));
 
-            target.Add(Single("foo"), 0);
+            target.Add(Single("foo"), BindingPriority.LocalValue);
 
             owner.Verify(x => x.Changed(target.Property, target.ValuePriority, AvaloniaProperty.UnsetValue, "foo"));
         }
@@ -178,7 +179,7 @@ namespace Avalonia.Base.UnitTests
             var target = new PriorityValue(owner.Object, TestProperty, typeof(string));
             var subject = new BehaviorSubject<object>("foo");
 
-            target.Add(subject, 0);
+            target.Add(subject, BindingPriority.LocalValue);
             subject.OnNext("bar");
 
             owner.Verify(x => x.Changed(target.Property, target.ValuePriority, "foo", "bar"));
@@ -189,8 +190,8 @@ namespace Avalonia.Base.UnitTests
         {
             var target = new PriorityValue(GetMockOwner().Object, TestProperty, typeof(string));
 
-            target.Add(Single("foo"), 0);
-            var disposable = target.Add(Single("bar"), 0);
+            target.Add(Single("foo"), BindingPriority.LocalValue);
+            var disposable = target.Add(Single("bar"), BindingPriority.LocalValue);
 
             Assert.Equal("bar", target.Value);
             disposable.Dispose();
@@ -202,8 +203,8 @@ namespace Avalonia.Base.UnitTests
         {
             var target = new PriorityValue(GetMockOwner().Object, TestProperty, typeof(string));
 
-            target.Add(Single("foo"), 0);
-            var disposable = target.Add(Single("bar"), 0);
+            target.Add(Single("foo"), BindingPriority.LocalValue);
+            var disposable = target.Add(Single("bar"), BindingPriority.LocalValue);
 
             Assert.Equal(2, target.GetBindings().Count());
             disposable.Dispose();
@@ -216,8 +217,8 @@ namespace Avalonia.Base.UnitTests
             var target = new PriorityValue(GetMockOwner().Object, TestProperty, typeof(string));
             var source = new BehaviorSubject<object>("bar");
 
-            target.Add(Single("foo"), 0);
-            target.Add(source, 0);
+            target.Add(Single("foo"), BindingPriority.LocalValue);
+            target.Add(source, BindingPriority.LocalValue);
 
             Assert.Equal("bar", target.Value);
             source.OnCompleted();
@@ -230,8 +231,8 @@ namespace Avalonia.Base.UnitTests
             var target = new PriorityValue(GetMockOwner().Object, TestProperty, typeof(string));
             var source = new BehaviorSubject<object>("bar");
 
-            target.Add(Single("foo"), 1);
-            target.Add(source, 0);
+            target.Add(Single("foo"), BindingPriority.StyleTrigger);
+            target.Add(source, BindingPriority.LocalValue);
 
             Assert.Equal("bar", target.Value);
             source.OnCompleted();
@@ -244,8 +245,8 @@ namespace Avalonia.Base.UnitTests
             var target = new PriorityValue(GetMockOwner().Object, TestProperty, typeof(string));
             var subject = new BehaviorSubject<object>("bar");
 
-            target.Add(Single("foo"), 0);
-            target.Add(subject, 0);
+            target.Add(Single("foo"), BindingPriority.LocalValue);
+            target.Add(subject, BindingPriority.LocalValue);
 
             Assert.Equal(2, target.GetBindings().Count());
             subject.OnCompleted();
@@ -257,9 +258,9 @@ namespace Avalonia.Base.UnitTests
         {
             var target = new PriorityValue(GetMockOwner().Object, TestProperty, typeof(int), x => Math.Min((int)x, 10));
 
-            target.SetValue(5, 0);
+            target.SetValue(5, BindingPriority.LocalValue);
             Assert.Equal(5, target.Value);
-            target.SetValue(15, 0);
+            target.SetValue(15, BindingPriority.LocalValue);
             Assert.Equal(10, target.Value);
         }
 
@@ -269,7 +270,7 @@ namespace Avalonia.Base.UnitTests
             var target = new PriorityValue(GetMockOwner().Object, TestProperty, typeof(int), x => Math.Min((int)x, 10));
             var source = new Subject<object>();
 
-            target.Add(source, 0);
+            target.Add(source, BindingPriority.LocalValue);
             source.OnNext(5);
             Assert.Equal(5, target.Value);
             source.OnNext(15);
@@ -283,7 +284,7 @@ namespace Avalonia.Base.UnitTests
             var target = new PriorityValue(GetMockOwner().Object, TestProperty, typeof(int), x => Math.Min((int)x, max));
             var source = new Subject<object>();
 
-            target.Add(source, 0);
+            target.Add(source, BindingPriority.LocalValue);
             source.OnNext(5);
             Assert.Equal(5, target.Value);
             source.OnNext(15);

@@ -393,7 +393,7 @@ namespace Avalonia
             _values?.Revalidate(property);
         }
         
-        internal void PriorityValueChanged(AvaloniaProperty property, int priority, object oldValue, object newValue)
+        internal void PriorityValueChanged(AvaloniaProperty property, BindingPriority priority, object oldValue, object newValue)
         {
             oldValue = (oldValue == AvaloniaProperty.UnsetValue) ?
                 GetDefaultValue(property) :
@@ -717,7 +717,7 @@ namespace Avalonia
             }
 
             LogPropertySet(property, value, priority);
-            Values.AddValue(property, value, (int)priority);
+            Values.AddValue(property, value, priority);
         }
 
         /// <summary>

@@ -42,7 +42,7 @@ namespace Avalonia
         /// <param name="priority">The priority.</param>
         public PriorityLevel(
             PriorityValue owner,
-            int priority)
+            BindingPriority priority)
         {
             Contract.Requires<ArgumentNullException>(owner != null);
 
@@ -61,7 +61,7 @@ namespace Avalonia
         /// <summary>
         /// Gets the priority of this level.
         /// </summary>
-        public int Priority { get; }
+        public BindingPriority Priority { get; }
 
         /// <summary>
         /// Gets or sets the direct value for this priority level.
