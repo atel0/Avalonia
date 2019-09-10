@@ -10,7 +10,7 @@ namespace Avalonia.Diagnostics.ViewModels
 {
     internal class ConsoleViewModel : ViewModelBase
     {
-        readonly ConsoleContext _context = new ConsoleContext();
+        readonly ConsoleContext _context;
         readonly Action<ConsoleContext> _updateContext;
         private int _historyIndex = -1;
         private string _input;
@@ -19,6 +19,7 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public ConsoleViewModel(Action<ConsoleContext> updateContext)
         {
+            _context = new ConsoleContext(this);
             _updateContext = updateContext;
         }
 
@@ -59,7 +60,10 @@ namespace Avalonia.Diagnostics.ViewModels
                     _state = await _state.ContinueWithAsync(Input);
                 }
 
-                History.Add(new ConsoleHistoryItem(Input, _state.ReturnValue));
+                if (_state.ReturnValue != ConsoleContext.NoOutput)
+                {
+                    History.Add(new ConsoleHistoryItem(Input, _state.ReturnValue ?? "(null)"));
+                }
             }
             catch (Exception ex)
             {

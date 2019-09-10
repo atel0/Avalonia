@@ -7,15 +7,17 @@ namespace Avalonia.Diagnostics.ViewModels
 {
     internal class MainViewModel : ViewModelBase
     {
+        private readonly IControl _root;
+        private readonly TreePageViewModel _logicalTree;
+        private readonly TreePageViewModel _visualTree;
         private TreePageViewModel _content;
         private int _selectedTab;
-        private TreePageViewModel _logicalTree;
-        private TreePageViewModel _visualTree;
         private string _focusedControl;
         private string _pointerOverElement;
 
         public MainViewModel(IControl root)
         {
+            _root = root;
             _logicalTree = new TreePageViewModel(LogicalTreeNode.Create(root));
             _visualTree = new TreePageViewModel(VisualTreeNode.Create(root));
 
@@ -85,6 +87,7 @@ namespace Avalonia.Diagnostics.ViewModels
 
         private void UpdateConsoleContext(ConsoleContext context)
         {
+            context.root = _root;
             context.e = Content.SelectedNode?.Visual;
         }
 
