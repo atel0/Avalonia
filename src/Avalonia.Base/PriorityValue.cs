@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Avalonia.Data;
 using Avalonia.Logging;
 using Avalonia.Utilities;
@@ -24,7 +23,8 @@ namespace Avalonia
     /// <see cref="IPriorityValueOwner.Changed"/> method on the 
     /// owner object is fired with the old and new values.
     /// </remarks>
-    internal sealed class PriorityValue : ISetAndNotifyHandler<(object, BindingPriority)>
+    internal sealed class PriorityValue : ISetAndNotifyHandler<(object, BindingPriority)>, 
+        Diagnostics.IAvaloniaPropertyValue
     {
         private readonly Type _valueType;
         private readonly SingleOrDictionary<BindingPriority, PriorityLevel> _levels = new SingleOrDictionary<BindingPriority, PriorityLevel>();
@@ -84,6 +84,9 @@ namespace Avalonia
         /// </summary>
         public BindingPriority ValuePriority => _value.priority;
 
+        /// <inheritdoc/>
+        public IEnumerable<Diagnostics.IPriorityLevel> Levels => _levels.Values;
+
         /// <summary>
         /// Adds a new binding.
         /// </summary>
@@ -120,46 +123,6 @@ namespace Avalonia
                     yield return binding;
                 }
             }
-        }
-
-        /// <summary>
-        /// Returns diagnostic string that can help the user debug the bindings in effect on
-        /// this object.
-        /// </summary>
-        /// <returns>A diagnostic string.</returns>
-        public string GetDiagnostic()
-        {
-            var b = new StringBuilder();
-            var first = true;
-
-            foreach (var level in _levels)
-            {
-                if (!first)
-                {
-                    b.AppendLine();
-                }
-
-                b.Append(ValuePriority == level.Key ? "*" : string.Empty);
-                b.Append("Priority ");
-                b.Append(level.Key);
-                b.Append(": ");
-                b.AppendLine(level.Value.Value?.ToString() ?? "(null)");
-                b.AppendLine("--------");
-                b.Append("Direct: ");
-                b.AppendLine(level.Value.DirectValue?.ToString() ?? "(null)");
-
-                foreach (var binding in level.Value.Bindings)
-                {
-                    b.Append(level.Value.ActiveBindingIndex == binding.Index ? "*" : string.Empty);
-                    b.Append(binding.Description ?? binding.Observable.GetType().Name);
-                    b.Append(": ");
-                    b.AppendLine(binding.Value?.ToString() ?? "(null)");
-                }
-
-                first = false;
-            }
-
-            return b.ToString();
         }
 
         /// <summary>

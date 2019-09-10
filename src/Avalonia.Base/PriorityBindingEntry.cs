@@ -11,7 +11,7 @@ namespace Avalonia
     /// <summary>
     /// A registered binding in a <see cref="PriorityValue"/>.
     /// </summary>
-    internal class PriorityBindingEntry : IDisposable, IObserver<object>
+    internal class PriorityBindingEntry : IDisposable, IObserver<object>, Diagnostics.IPriorityBindingEntry
     {
         private readonly PriorityLevel _owner;
         private IDisposable _subscription;
@@ -57,7 +57,7 @@ namespace Avalonia
         public bool HasCompleted { get; private set; }
 
         /// <summary>
-        /// The current value of the binding.
+        /// Gets the current value of the binding.
         /// </summary>
         public object Value
         {

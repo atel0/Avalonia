@@ -1,6 +1,8 @@
 // Copyright (c) The Avalonia Project. All rights reserved.
 // Licensed under the MIT license. See licence.md file in the project root for full license information.
 
+using System.Collections.Generic;
+using System.Linq;
 using Avalonia.Data;
 
 namespace Avalonia.Diagnostics
@@ -16,40 +18,49 @@ namespace Avalonia.Diagnostics
         /// <param name="o">The object.</param>
         /// <param name="property">The property.</param>
         /// <returns>
-        /// A <see cref="AvaloniaPropertyValue"/> that can be used to diagnose the state of the
-        /// property on the object.
+        /// An <see cref="IAvaloniaPropertyValue"/> that can be used to diagnose the state of the
+        /// property on the object, or null if the property is not set on the object.
         /// </returns>
-        public static AvaloniaPropertyValue GetDiagnostic(this AvaloniaObject o, AvaloniaProperty property)
+        public static IAvaloniaPropertyValue GetDiagnostic(this AvaloniaObject o, AvaloniaProperty property)
         {
             var set = o.GetSetValues();
 
             if (set.TryGetValue(property, out var obj))
             {
-                if (obj is PriorityValue value)
-                {
-                    return new AvaloniaPropertyValue(
-                        property,
-                        o.GetValue(property),
-                        (BindingPriority)value.ValuePriority,
-                        value.GetDiagnostic());
-                }
-                else
-                {
-                    return new AvaloniaPropertyValue(
-                        property,
-                        obj,
-                        BindingPriority.LocalValue,
-                        "Local value");
-                }
+                return obj as IAvaloniaPropertyValue ?? new LocalValuePropertyValue(property, obj);
             }
-            else
+
+            return null;
+        }
+
+        private class LocalValuePropertyValue : IAvaloniaPropertyValue
+        {
+            public LocalValuePropertyValue(
+                AvaloniaProperty property,
+                object value)
             {
-                return new AvaloniaPropertyValue(
-                    property,
-                    o.GetValue(property),
-                    BindingPriority.Unset,
-                    "Unset");
+                Property = property;
+                Value = value;
+                Levels = new[] { new LocalValuePriorityLevel(value) };
             }
+
+            public AvaloniaProperty Property { get; }
+
+            public object Value { get; }
+
+            public BindingPriority ValuePriority => BindingPriority.LocalValue;
+
+            public IEnumerable<IPriorityLevel> Levels { get; }
+        }
+
+
+        private class LocalValuePriorityLevel : IPriorityLevel
+        {
+            public LocalValuePriorityLevel(object value) => DirectValue = value;
+            public object DirectValue { get; }
+            public BindingPriority Priority => BindingPriority.LocalValue;
+            public int ActiveBindingIndex => -1;
+            public IEnumerable<IPriorityBindingEntry> Bindings => Enumerable.Empty<IPriorityBindingEntry>();
         }
     }
 }

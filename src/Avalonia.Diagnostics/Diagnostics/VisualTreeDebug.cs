@@ -40,7 +40,7 @@ namespace Avalonia.Diagnostics
                 {
                     var value = control.GetDiagnostic(property);
 
-                    if (value.Priority != BindingPriority.Unset)
+                    if (value.ValuePriority != BindingPriority.Unset)
                     {
                         builder.Append(Indent(indent));
                         builder.Append(" |  ");
@@ -48,7 +48,7 @@ namespace Avalonia.Diagnostics
                         builder.Append(" = ");
                         builder.Append(value.Value ?? "(null)");
                         builder.Append(" [");
-                        builder.Append(value.Priority);
+                        builder.Append(value.ValuePriority);
                         builder.AppendLine("]");
                     }
                 }

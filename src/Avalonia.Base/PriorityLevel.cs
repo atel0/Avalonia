@@ -30,7 +30,7 @@ namespace Avalonia
     /// current value until the active binding fires again.
     /// </para>
     /// </remarks>
-    internal class PriorityLevel
+    internal class PriorityLevel : Diagnostics.IPriorityLevel
     {
         private object _directValue;
         private int _nextIndex;
@@ -95,6 +95,9 @@ namespace Avalonia
         /// Gets the bindings for the priority level.
         /// </summary>
         public LinkedList<PriorityBindingEntry> Bindings { get; }
+
+        /// <inheritdoc/>
+        IEnumerable<Diagnostics.IPriorityBindingEntry> Diagnostics.IPriorityLevel.Bindings => Bindings;
 
         /// <summary>
         /// Adds a binding.
