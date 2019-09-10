@@ -34,7 +34,8 @@
              BorderThickness="1"
              Text="{Binding Input}"/>
     
-    <ListBox BorderThickness="0"
+    <ListBox Name="historyList"
+             BorderThickness="0"
              FontFamily="/Assets/Fonts/SourceSansPro-Regular.ttf"
              Items="{Binding History}"
              VirtualizationMode="None">
