@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:views="clr-namespace:Avalonia.Diagnostics.Views"
              x:Class="Avalonia.Diagnostics.Views.MainView">
-  <Grid Name="rootGrid" RowDefinitions="Auto,Auto,Auto,2*,Auto,Auto,Auto">
+  <Grid Name="rootGrid" RowDefinitions="Auto,Auto,Auto,*,Auto,0,Auto">
     <Menu>
       <MenuItem Header="_File">
         <MenuItem Header="E_xit" Command="{Binding $parent[Window].Close}"/>
@@ -27,7 +27,8 @@
     
     <ContentControl Grid.Row="3" Content="{Binding Content}"/>
 
-    <GridSplitter Grid.Row="4" Background="Silver" Height="1"/>
+    <GridSplitter Name="consoleSplitter" Grid.Row="4" Height="1"
+                  Background="Silver" IsEnabled="False"/>
     
     <views:ConsoleView Name="console"
                        Grid.Row="5"

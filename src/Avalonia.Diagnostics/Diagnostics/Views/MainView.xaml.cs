@@ -11,14 +11,16 @@ namespace Avalonia.Diagnostics.Views
     {
         private const int ConsoleRow = 5;
         private readonly ConsoleView _console;
+        private readonly GridSplitter _consoleSplitter;
         private readonly Grid _rootGrid;
-        private double _consoleHeight = 1;
+        private double _consoleHeight = -1;
 
         public MainView()
         {
             InitializeComponent();
             AddHandler(KeyDownEvent, PreviewKeyDown, RoutingStrategies.Tunnel);
             _console = this.FindControl<ConsoleView>("console");
+            _consoleSplitter = this.FindControl<GridSplitter>("consoleSplitter");
             _rootGrid = this.FindControl<Grid>("rootGrid");
         }
 
@@ -26,17 +28,23 @@ namespace Avalonia.Diagnostics.Views
         {
             var vm = (MainViewModel)DataContext;
 
+            if (_consoleHeight == -1)
+            {
+                _consoleHeight = Bounds.Height / 3;
+            }
+
             vm.Console.ToggleVisibility();
+            _consoleSplitter.IsEnabled = vm.Console.IsVisible;
 
             if (vm.Console.IsVisible)
             {
-                _rootGrid.RowDefinitions[ConsoleRow].Height = new GridLength(_consoleHeight, GridUnitType.Star);
+                _rootGrid.RowDefinitions[ConsoleRow].Height = new GridLength(_consoleHeight, GridUnitType.Pixel);
                 Dispatcher.UIThread.Post(() => _console.FocusInput(), DispatcherPriority.Background);
             }
             else
             {
                 _consoleHeight = _rootGrid.RowDefinitions[ConsoleRow].Height.Value;
-                _rootGrid.RowDefinitions[ConsoleRow].Height = GridLength.Auto;
+                _rootGrid.RowDefinitions[ConsoleRow].Height = new GridLength(0, GridUnitType.Pixel);
             }
         }
 
