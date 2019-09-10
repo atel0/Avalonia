@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Avalonia.Controls.Primitives;
+using Avalonia.Diagnostics;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using ControlCatalog.ViewModels;

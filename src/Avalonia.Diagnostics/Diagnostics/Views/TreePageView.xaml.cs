@@ -1,6 +1,3 @@
-// Copyright (c) The Avalonia Project. All rights reserved.
-// Licensed under the MIT license. See licence.md file in the project root for full license information.
-
 using Avalonia.Controls;
 using Avalonia.Controls.Generators;
 using Avalonia.Controls.Primitives;
@@ -12,14 +9,14 @@ using Avalonia.Media;
 
 namespace Avalonia.Diagnostics.Views
 {
-    public class TreePageView : UserControl
+    internal class TreePageView : UserControl
     {
         private Control _adorner;
         private TreeView _tree;
 
         public TreePageView()
         {
-            InitializeComponent();
+            this.InitializeComponent();
             _tree.ItemContainerGenerator.Index.Materialized += TreeViewItemMaterialized;
         }
 
@@ -39,7 +36,7 @@ namespace Avalonia.Diagnostics.Views
                 _adorner = new Rectangle
                 {
                     Fill = new SolidColorBrush(0x80a0c5e8),
-                    [AdornerLayer.AdornedElementProperty] = node.Visual
+                    [AdornerLayer.AdornedElementProperty] = node.Visual,
                 };
 
                 layer.Children.Add(_adorner);

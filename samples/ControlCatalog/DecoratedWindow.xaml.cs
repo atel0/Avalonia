@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using System;
 using Avalonia.Input;
+using Avalonia.Diagnostics;
 
 namespace ControlCatalog
 {

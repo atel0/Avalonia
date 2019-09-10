@@ -1,29 +1,23 @@
-// Copyright (c) The Avalonia Project. All rights reserved.
-// Licensed under the MIT license. See licence.md file in the project root for full license information.
-
 using Avalonia.Controls;
 using Avalonia.VisualTree;
 
 namespace Avalonia.Diagnostics.ViewModels
 {
-    internal class TreePageViewModel : ViewModelBase, IDevToolViewModel
+    internal class TreePageViewModel : ViewModelBase
     {
         private TreeNode _selected;
         private ControlDetailsViewModel _details;
 
-        public TreePageViewModel(TreeNode[] nodes, string name)
+        public TreePageViewModel(TreeNode[] nodes)
         {
             Nodes = nodes;
-            Name = name;
         }
-
-        public string Name { get; }
 
         public TreeNode[] Nodes { get; protected set; }
 
         public TreeNode SelectedNode
         {
-            get => _selected;
+            get { return _selected; }
             set
             {
                 if (RaiseAndSetIfChanged(ref _selected, value))
@@ -35,8 +29,8 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public ControlDetailsViewModel Details
         {
-            get => _details;
-            private set => RaiseAndSetIfChanged(ref _details, value);
+            get { return _details; }
+            private set { RaiseAndSetIfChanged(ref _details, value); }
         }
 
         public TreeNode FindNode(IControl control)
@@ -66,7 +60,7 @@ namespace Avalonia.Diagnostics.ViewModels
                 {
                     control = control.GetVisualParent<IControl>();
                 }
-            }
+            }            
 
             if (node != null)
             {
@@ -90,14 +84,16 @@ namespace Avalonia.Diagnostics.ViewModels
             {
                 return node;
             }
-
-            foreach (var child in node.Children)
+            else
             {
-                var result = FindNode(child, control);
-
-                if (result != null)
+                foreach (var child in node.Children)
                 {
-                    return result;
+                    var result = FindNode(child, control);
+
+                    if (result != null)
+                    {
+                        return result;
+                    }
                 }
             }
 

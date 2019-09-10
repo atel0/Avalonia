@@ -1,6 +1,3 @@
-// Copyright (c) The Avalonia Project. All rights reserved.
-// Licensed under the MIT license. See licence.md file in the project root for full license information.
-
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.LogicalTree;
@@ -17,7 +14,8 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public static LogicalTreeNode[] Create(object control)
         {
-            return control is ILogical logical ? new[] { new LogicalTreeNode(logical, null) } : null;
+            var logical = control as ILogical;
+            return logical != null ? new[] { new LogicalTreeNode(logical, null) } : null;
         }
     }
 }
