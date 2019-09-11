@@ -1,11 +1,8 @@
 // Copyright (c) The Avalonia Project. All rights reserved.
 // Licensed under the MIT license. See licence.md file in the project root for full license information.
 
-using System;
 using System.ComponentModel;
 using System.Globalization;
-using System.Reactive.Linq;
-using Avalonia.Data;
 using Avalonia.Data.Converters;
 
 namespace Avalonia.Diagnostics.ViewModels
@@ -13,7 +10,6 @@ namespace Avalonia.Diagnostics.ViewModels
     internal class PropertyDetails : ViewModelBase
     {
         private AvaloniaObject _target;
-        private AvaloniaProperty _property;
         private object _value;
         private string _priority;
         private TypeConverter _converter;
@@ -22,25 +18,26 @@ namespace Avalonia.Diagnostics.ViewModels
         public PropertyDetails(AvaloniaObject o, AvaloniaProperty property)
         {
             _target = o;
-            _property = property;
+            Property = property;
 
             Name = property.IsAttached ?
                 $"[{property.OwnerType.Name}.{property.Name}]" :
                 property.Name;
-            UpdateGroup();
 
-            // TODO: Unsubscribe when view model is deactivated.
-            o.GetObservable(property).Subscribe(x =>
+            if (property.IsDirect)
             {
-                var diagnostic = o.GetDiagnostic(property);
-                RaiseAndSetIfChanged(ref _value, x);
-                Priority = diagnostic?.ValuePriority.ToString() ?? "Unset";
-            });
+                Group = "Properties";
+                Priority = "Direct";
+            }
+
+            Update();
         }
+
+        public AvaloniaProperty Property { get; }
 
         public string Name { get; }
 
-        public bool IsAttached => _property.IsAttached;
+        public bool IsAttached => Property.IsAttached;
 
         public string Priority
         {
@@ -67,8 +64,8 @@ namespace Avalonia.Diagnostics.ViewModels
                 {
                     var convertedValue = Converter?.CanConvertFrom(typeof(string)) == true ?
                         Converter.ConvertFromString(value) :
-                        DefaultValueConverter.Instance.ConvertBack(value, _property.PropertyType, null, CultureInfo.CurrentCulture);
-                    _target.SetValue(_property, convertedValue);
+                        DefaultValueConverter.Instance.ConvertBack(value, Property.PropertyType, null, CultureInfo.CurrentCulture);
+                    _target.SetValue(Property, convertedValue);
                 }
                 catch { }
             }
@@ -93,25 +90,27 @@ namespace Avalonia.Diagnostics.ViewModels
             }
         }
         
-
-        protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+        public void Update()
         {
-            UpdateGroup();
-        }
-
-        private void UpdateGroup()
-        {
-            if (Priority == "Unset")
+            if (Property.IsDirect)
             {
-                Group = Priority;
-            }
-            else if (IsAttached)
-            {
-                Group = "Attached Properties";
+                RaiseAndSetIfChanged(ref _value, _target.GetValue(Property), nameof(Value));
             }
             else
             {
-                Group = "Properties";
+                var val = _target.GetDiagnostic(Property);
+
+                RaiseAndSetIfChanged(ref _value, val?.Value, nameof(Value));
+
+                if (val != null)
+                {
+                    Group = IsAttached ? "Attached Properties" : "Properties";
+                    Priority = val.ValuePriority.ToString();
+                }
+                else
+                {
+                    Group = Priority = "Unset";
+                }
             }
         }
     }

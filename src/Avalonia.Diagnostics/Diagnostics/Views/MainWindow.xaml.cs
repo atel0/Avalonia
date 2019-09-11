@@ -45,6 +45,7 @@ namespace Avalonia.Diagnostics.Views
         {
             base.HandleClosed();
             _keySubscription.Dispose();
+            ((MainViewModel)DataContext)?.Dispose();
         }
 
         private void InitializeComponent()

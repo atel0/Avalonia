@@ -5,7 +5,7 @@ using Avalonia.Input;
 
 namespace Avalonia.Diagnostics.ViewModels
 {
-    internal class MainViewModel : ViewModelBase
+    internal class MainViewModel : ViewModelBase, IDisposable
     {
         private readonly IControl _root;
         private readonly TreePageViewModel _logicalTree;
@@ -99,6 +99,12 @@ namespace Avalonia.Diagnostics.ViewModels
             {
                 tree.SelectControl(control);
             }
+        }
+
+        public void Dispose()
+        {
+            _logicalTree.Dispose();
+            _visualTree.Dispose();
         }
 
         private void UpdateFocusedControl()

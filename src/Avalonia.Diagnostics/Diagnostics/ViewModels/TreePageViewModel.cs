@@ -1,9 +1,10 @@
+using System;
 using Avalonia.Controls;
 using Avalonia.VisualTree;
 
 namespace Avalonia.Diagnostics.ViewModels
 {
-    internal class TreePageViewModel : ViewModelBase
+    internal class TreePageViewModel : ViewModelBase, IDisposable
     {
         private TreeNode _selected;
         private ControlDetailsViewModel _details;
@@ -17,7 +18,7 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public TreeNode SelectedNode
         {
-            get { return _selected; }
+            get => _selected;
             set
             {
                 if (RaiseAndSetIfChanged(ref _selected, value))
@@ -29,9 +30,19 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public ControlDetailsViewModel Details
         {
-            get { return _details; }
-            private set { RaiseAndSetIfChanged(ref _details, value); }
+            get => _details;
+            private set
+            {
+                var oldValue = _details;
+
+                if (RaiseAndSetIfChanged(ref _details, value))
+                {
+                    oldValue?.Dispose();
+                }
+            }
         }
+
+        public void Dispose() => _details?.Dispose();
 
         public TreeNode FindNode(IControl control)
         {

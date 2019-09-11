@@ -7,7 +7,14 @@ namespace Avalonia.Diagnostics.ViewModels
 {
     public class ViewModelBase : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        private PropertyChangedEventHandler _propertyChanged;
+        private List<string> events = new List<string>();
+
+        public event PropertyChangedEventHandler PropertyChanged
+        {
+            add { _propertyChanged += value; events.Add("added"); }
+            remove { _propertyChanged -= value; events.Add("removed"); }
+        }
 
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
         {
@@ -29,7 +36,7 @@ namespace Avalonia.Diagnostics.ViewModels
         {
             var e = new PropertyChangedEventArgs(propertyName);
             OnPropertyChanged(e);
-            PropertyChanged?.Invoke(this, e);
+            _propertyChanged?.Invoke(this, e);
         }
     }
 }
