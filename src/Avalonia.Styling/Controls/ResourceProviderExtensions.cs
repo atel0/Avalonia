@@ -57,7 +57,7 @@ namespace Avalonia.Controls
             return new ResourceObservable(target, key);
         }
 
-        private class ResourceObservable : LightweightObservableBase<object>
+        private class ResourceObservable : LightweightObservableBase<object>, IDescription
         {
             private readonly IResourceNode _target;
             private readonly object _key;
@@ -67,6 +67,8 @@ namespace Avalonia.Controls
                 _target = target;
                 _key = key;
             }
+
+            public string Description => $"Resource: {_key}";
 
             protected override void Initialize()
             {

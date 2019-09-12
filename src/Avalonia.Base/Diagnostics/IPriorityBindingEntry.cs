@@ -1,10 +1,17 @@
-﻿namespace Avalonia.Diagnostics
+﻿using System;
+
+namespace Avalonia.Diagnostics
 {
     /// <summary>
     /// Provides diagnostic information about a binding in an <see cref="IPriorityLevel"/>.
     /// </summary>
     public interface IPriorityBindingEntry
     {
+        /// <summary>
+        /// Gets the observable associated with the entry.
+        /// </summary>
+        IObservable<object> Observable { get; }
+
         /// <summary>
         /// Gets a description of the binding.
         /// </summary>

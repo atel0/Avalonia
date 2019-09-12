@@ -9,7 +9,8 @@ namespace Avalonia.Diagnostics.ViewModels
     internal class ControlDetailsViewModel : ViewModelBase, IDisposable
     {
         private readonly IVisual _control;
-        private readonly IDictionary<AvaloniaProperty, PropertyDetails> _propertyIndex;
+        private readonly IDictionary<AvaloniaProperty, PropertyDetailsViewModel> _propertyIndex;
+        private PropertyDetailsViewModel _selectedProperty;
         private string _propertyFilter;
 
         public ControlDetailsViewModel(IVisual control)
@@ -20,13 +21,13 @@ namespace Avalonia.Diagnostics.ViewModels
             {
                 var properties = AvaloniaPropertyRegistry.Instance.GetRegistered(avaloniaObject)
                     .Concat(AvaloniaPropertyRegistry.Instance.GetRegisteredAttached(avaloniaObject.GetType()))
-                    .Select(x => new PropertyDetails(avaloniaObject, x))
+                    .Select(x => new PropertyDetailsViewModel(avaloniaObject, x))
                     .OrderBy(x => x, PropertyComparer.Instance)
                     .ThenBy(x => x.IsAttached)
                     .ThenBy(x => x.Name)
                     .ToList();
 
-                _propertyIndex = new Dictionary<AvaloniaProperty, PropertyDetails>();
+                _propertyIndex = new Dictionary<AvaloniaProperty, PropertyDetailsViewModel>();
 
                 foreach (var p in properties)
                 {
@@ -37,7 +38,7 @@ namespace Avalonia.Diagnostics.ViewModels
                 }
 
                 var view = new DataGridCollectionView(properties);
-                view.GroupDescriptions.Add(new DataGridPathGroupDescription(nameof(PropertyDetails.Group)));
+                view.GroupDescriptions.Add(new DataGridPathGroupDescription(nameof(PropertyDetailsViewModel.Group)));
                 view.Filter = FilterProperty;
                 PropertiesView = view;
 
@@ -65,6 +66,12 @@ namespace Avalonia.Diagnostics.ViewModels
             }
         }
 
+        public PropertyDetailsViewModel SelectedProperty
+        {
+            get => _selectedProperty;
+            set => RaiseAndSetIfChanged(ref _selectedProperty, value);
+        }
+
         public void Dispose()
         {
             if (_control is AvaloniaObject avaloniaObject)
@@ -83,7 +90,7 @@ namespace Avalonia.Diagnostics.ViewModels
 
         private bool FilterProperty(object arg)
         {
-            if (!string.IsNullOrWhiteSpace(PropertyFilter) && arg is PropertyDetails property)
+            if (!string.IsNullOrWhiteSpace(PropertyFilter) && arg is PropertyDetailsViewModel property)
             {
                 return property.Name.IndexOf(PropertyFilter, StringComparison.OrdinalIgnoreCase) != -1;
             }
@@ -91,11 +98,11 @@ namespace Avalonia.Diagnostics.ViewModels
             return true;
         }
 
-        private class PropertyComparer : IComparer<PropertyDetails>
+        private class PropertyComparer : IComparer<PropertyDetailsViewModel>
         {
             public static PropertyComparer Instance { get; } = new PropertyComparer();
 
-            public int Compare(PropertyDetails x, PropertyDetails y)
+            public int Compare(PropertyDetailsViewModel x, PropertyDetailsViewModel y)
             {
                 var groupX = GroupIndex(x.Group);
                 var groupY = GroupIndex(y.Group);

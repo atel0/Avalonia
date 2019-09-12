@@ -1,21 +1,21 @@
-// Copyright (c) The Avalonia Project. All rights reserved.
-// Licensed under the MIT license. See licence.md file in the project root for full license information.
-
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
+using Avalonia.Collections;
 using Avalonia.Data.Converters;
 
 namespace Avalonia.Diagnostics.ViewModels
 {
-    internal class PropertyDetails : ViewModelBase
+    internal class PropertyDetailsViewModel : ViewModelBase
     {
         private AvaloniaObject _target;
         private object _value;
         private string _priority;
         private TypeConverter _converter;
         private string _group;
+        private DataGridCollectionView _bindingsView;
 
-        public PropertyDetails(AvaloniaObject o, AvaloniaProperty property)
+        public PropertyDetailsViewModel(AvaloniaObject o, AvaloniaProperty property)
         {
             _target = o;
             Property = property;
@@ -41,8 +41,8 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public string Priority
         {
-            get { return _priority; }
-            private set { RaiseAndSetIfChanged(ref _priority, value); }
+            get => _priority;
+            private set => RaiseAndSetIfChanged(ref _priority, value);
         }
 
         public string Value
@@ -73,8 +73,14 @@ namespace Avalonia.Diagnostics.ViewModels
 
         public string Group
         {
-            get { return _group; }
-            private set { RaiseAndSetIfChanged(ref _group, value); }
+            get => _group;
+            private set => RaiseAndSetIfChanged(ref _group, value);
+        }
+
+        public DataGridCollectionView BindingsView
+        {
+            get => _bindingsView;
+            private set => RaiseAndSetIfChanged(ref _bindingsView, value);
         }
 
         private TypeConverter Converter
@@ -106,10 +112,20 @@ namespace Avalonia.Diagnostics.ViewModels
                 {
                     Group = IsAttached ? "Attached Properties" : "Properties";
                     Priority = val.ValuePriority.ToString();
+
+                    var bindings = val.Levels.SelectMany(x => x.Bindings, (level, binding) => (level, binding))
+                        .Select(x => new BindingDetailsViewModel(x.binding, x.level, val.ValuePriority))
+                        .ToList();
+
+                    BindingsView = new DataGridCollectionView(bindings)
+                    {
+                        GroupDescriptions = { new DataGridPathGroupDescription(nameof(BindingDetailsViewModel.Priority)) }
+                    };
                 }
                 else
                 {
                     Group = Priority = "Unset";
+                    BindingsView = null;
                 }
             }
         }
