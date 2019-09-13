@@ -2,8 +2,7 @@
 
 namespace Avalonia.Markup.Parsers.Nodes
 {
-    internal class SelfNode : ExpressionNode
+    internal class SelfNode : ExpressionNode<object, object>
     {
-        public override string Description => "$self";
     }
 }

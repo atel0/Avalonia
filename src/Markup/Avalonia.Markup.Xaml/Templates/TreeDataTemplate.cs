@@ -42,8 +42,8 @@ namespace Avalonia.Markup.Xaml.Templates
         {
             if (ItemsSource != null)
             {
-                var obs = ExpressionObserverBuilder.Build(item, ItemsSource.Path);
-                return InstancedBinding.OneWay(obs, BindingPriority.Style);
+                ////var obs = ExpressionObserverBuilder.Build(item, ItemsSource.Path);
+                ////return InstancedBinding.OneWay(obs, BindingPriority.Style);
             }
 
             return null;

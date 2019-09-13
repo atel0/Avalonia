@@ -288,52 +288,52 @@ namespace Avalonia.Markup.UnitTests.Data
             Assert.Equal(new[] { null, "bar" }, values);
         }
 
-        [Fact]
-        public void Should_Use_DefaultValueConverter_When_No_Converter_Specified()
-        {
-            var target = new TextBlock(); ;
-            var binding = new Binding
-            {
-                Path = "Foo",
-            };
+        ////[Fact]
+        ////public void Should_Use_DefaultValueConverter_When_No_Converter_Specified()
+        ////{
+        ////    var target = new TextBlock(); ;
+        ////    var binding = new Binding
+        ////    {
+        ////        Path = "Foo",
+        ////    };
 
-            var result = binding.Initiate(target, TextBox.TextProperty).Subject;
+        ////    var result = binding.Initiate(target, TextBox.TextProperty).Subject;
 
-            Assert.IsType<DefaultValueConverter>(((BindingExpression)result).Converter);
-        }
+        ////    Assert.IsType<DefaultValueConverter>(((BindingExpression)result).Converter);
+        ////}
 
-        [Fact]
-        public void Should_Use_Supplied_Converter()
-        {
-            var target = new TextBlock();
-            var converter = new Mock<IValueConverter>();
-            var binding = new Binding
-            {
-                Converter = converter.Object,
-                Path = "Foo",
-            };
+        ////[Fact]
+        ////public void Should_Use_Supplied_Converter()
+        ////{
+        ////    var target = new TextBlock();
+        ////    var converter = new Mock<IValueConverter>();
+        ////    var binding = new Binding
+        ////    {
+        ////        Converter = converter.Object,
+        ////        Path = "Foo",
+        ////    };
 
-            var result = binding.Initiate(target, TextBox.TextProperty).Subject;
+        ////    var result = binding.Initiate(target, TextBox.TextProperty).Subject;
 
-            Assert.Same(converter.Object, ((BindingExpression)result).Converter);
-        }
+        ////    Assert.Same(converter.Object, ((BindingExpression)result).Converter);
+        ////}
 
-        [Fact]
-        public void Should_Pass_ConverterParameter_To_Supplied_Converter()
-        {
-            var target = new TextBlock();
-            var converter = new Mock<IValueConverter>();
-            var binding = new Binding
-            {
-                Converter = converter.Object,
-                ConverterParameter = "foo",
-                Path = "Bar",
-            };
+        ////[Fact]
+        ////public void Should_Pass_ConverterParameter_To_Supplied_Converter()
+        ////{
+        ////    var target = new TextBlock();
+        ////    var converter = new Mock<IValueConverter>();
+        ////    var binding = new Binding
+        ////    {
+        ////        Converter = converter.Object,
+        ////        ConverterParameter = "foo",
+        ////        Path = "Bar",
+        ////    };
 
-            var result = binding.Initiate(target, TextBox.TextProperty).Subject;
+        ////    var result = binding.Initiate(target, TextBox.TextProperty).Subject;
 
-            Assert.Same("foo", ((BindingExpression)result).ConverterParameter);
-        }
+        ////    Assert.Same("foo", ((BindingExpression)result).ConverterParameter);
+        ////}
 
         [Fact]
         public void Should_Return_FallbackValue_When_Path_Not_Resolved()

@@ -1,47 +1,6 @@
-﻿using System;
-
-namespace Avalonia.Data.Core
+﻿namespace Avalonia.Data.Core
 {
-    public abstract class SettableNode : ExpressionNode
+    public abstract class SettableNode<TIn, TOut> : ExpressionNode<TIn, TOut>
     {
-        public bool SetTargetValue(object value, BindingPriority priority)
-        {
-            if (ShouldNotSet(value))
-            {
-                return true;
-            }
-            return SetTargetValueCore(value, priority);
-        }
-
-        private bool ShouldNotSet(object value)
-        {
-            if (PropertyType == null)
-            {
-                return false;
-            }
-
-            if (LastValue == null)
-            {
-                return false;
-            }
-
-            bool isLastValueAlive = LastValue.TryGetTarget(out object lastValue);
-
-            if (!isLastValueAlive)
-            {
-                return false;
-            }
-
-            if (PropertyType.IsValueType)
-            {
-                return lastValue.Equals(value);
-            }
-
-            return ReferenceEquals(lastValue, value);
-        }
-
-        protected abstract bool SetTargetValueCore(object value, BindingPriority priority);
-
-        public abstract Type PropertyType { get; }
     }
 }

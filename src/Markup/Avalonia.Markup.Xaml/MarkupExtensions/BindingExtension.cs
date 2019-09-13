@@ -29,19 +29,19 @@ namespace Avalonia.Markup.Xaml.MarkupExtensions
 
             return new Binding
             {
-                TypeResolver = descriptorContext.ResolveType,
-                Converter = Converter,
-                ConverterParameter = ConverterParameter,
-                ElementName = ElementName,
-                FallbackValue = FallbackValue,
-                Mode = Mode,
-                Path = Path,
-                Priority = Priority,
-                Source = Source,
-                StringFormat = StringFormat,
-                RelativeSource = RelativeSource,
-                DefaultAnchor = new WeakReference(GetDefaultAnchor(descriptorContext)),
-                NameScope = new WeakReference<INameScope>(serviceProvider.GetService<INameScope>())
+                ////TypeResolver = descriptorContext.ResolveType,
+                ////Converter = Converter,
+                ////ConverterParameter = ConverterParameter,
+                ////ElementName = ElementName,
+                ////FallbackValue = FallbackValue,
+                ////Mode = Mode,
+                ////Path = Path,
+                ////Priority = Priority,
+                ////Source = Source,
+                ////StringFormat = StringFormat,
+                ////RelativeSource = RelativeSource,
+                ////DefaultAnchor = new WeakReference(GetDefaultAnchor(descriptorContext)),
+                ////NameScope = new WeakReference<INameScope>(serviceProvider.GetService<INameScope>())
             };
         }
 

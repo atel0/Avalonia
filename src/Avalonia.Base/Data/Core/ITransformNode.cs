@@ -1,7 +1,7 @@
 ﻿namespace Avalonia.Data.Core
 {
-    interface ITransformNode
+    interface ITransformNode<TIn, TOut>
     {
-        object Transform(object value);
+        TOut Transform(TIn value);
     }
 }
