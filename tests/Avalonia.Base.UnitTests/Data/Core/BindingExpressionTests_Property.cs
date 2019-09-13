@@ -68,18 +68,14 @@ namespace Avalonia.Base.UnitTests.Data.Core
         }
 
         [Fact]
-        public async Task Should_Return_BindingNotification_Error_For_Root_Null()
+        public void Should_Not_Return_Value_When_Root_Null()
         {
             var target = BindingExpression.Create(default(Class3), o => o.Foo);
-            var result = await target.Take(1);
+            var result = new List<string>();
 
-            Assert.IsType<NullReferenceException>(result.Error);
-            //Assert.Equal(
-            //    new BindingNotification(
-            //            new MarkupBindingChainException("Null value", "o => o.Foo", string.Empty),
-            //            BindingErrorType.Error,
-            //            AvaloniaProperty.UnsetValue),
-            //    result);
+            target.Subscribe(x => result.Add(x.Value));
+
+            Assert.Empty(result);
         }
 
         ////[Fact]

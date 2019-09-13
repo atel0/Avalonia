@@ -1,9 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Linq.Expressions;
 using System.Reactive.Subjects;
-using Avalonia.Data.Core.Parsers;
 using Avalonia.Reactive;
 
 #nullable enable
@@ -23,12 +22,11 @@ namespace Avalonia.Data.Core
 
         public BindingExpression(
             IObservable<TIn> root,
-            Expression<Func<TIn, TOut>> expression)
+            Func<TIn, TOut> read,
+            List<Delegate> links)
         {
-            var links = ExpressionChainVisitor.Build(expression);
-
             _rootSource = root;
-            _read = expression.Compile();
+            _read = read;
             _chain = new Link[links.Count];
 
             for (var i = 0; i < links.Count; ++i)
@@ -146,9 +144,10 @@ namespace Avalonia.Data.Core
             if (o is INotifyCollectionChanged incc)
             {
                 incc.CollectionChanged += ChainCollectionChanged;
+                result |= true;
             }
 
-            return false;
+            return result;
         }
 
         private void UnsubscribeToChanges(object? o)
