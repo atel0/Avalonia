@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reactive.Subjects;
@@ -85,17 +86,26 @@ namespace Avalonia.Data.Core
                 var arg = new[] { root };
                 object? last = null;
 
-                for (var i = from; i < _chain.Length; ++i)
+                try
                 {
-                    var o = _chain[i].Eval.DynamicInvoke(arg);
-
-                    if (o != last)
+                    for (var i = from; i < _chain.Length; ++i)
                     {
-                        _chain[i].Value = o;
-                        SubscribeToChanges(o);
-                    }
+                        var o = _chain[i].Eval.DynamicInvoke(arg);
 
-                    last = o;
+                        if (o != last)
+                        {
+                            _chain[i].Value = o;
+
+                            if (SubscribeToChanges(o))
+                            {
+                                last = o;
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                    // Broken expression chain.
                 }
             }
         }
@@ -113,23 +123,32 @@ namespace Avalonia.Data.Core
             }
         }
 
-        private void SubscribeToChanges(object? o)
+        private bool SubscribeToChanges(object? o)
         {
             if (o is null)
             {
-                return;
+                return false;
             }
+
+            var result = false;
 
             if (o is IAvaloniaObject ao)
             {
                 ao.PropertyChanged += ChainPropertyChanged;
-                return;
+                result |= true;
             }
-
-            if (o is INotifyPropertyChanged inpc)
+            else if (o is INotifyPropertyChanged inpc)
             {
                 inpc.PropertyChanged += ChainPropertyChanged;
+                result |= true;
             }
+
+            if (o is INotifyCollectionChanged incc)
+            {
+                incc.CollectionChanged += ChainCollectionChanged;
+            }
+
+            return false;
         }
 
         private void UnsubscribeToChanges(object? o)
@@ -144,10 +163,14 @@ namespace Avalonia.Data.Core
                 ao.PropertyChanged -= ChainPropertyChanged;
                 return;
             }
-
-            if (o is INotifyPropertyChanged inpc)
+            else if (o is INotifyPropertyChanged inpc)
             {
                 inpc.PropertyChanged -= ChainPropertyChanged;
+            }
+
+            if (o is INotifyCollectionChanged incc)
+            {
+                incc.CollectionChanged -= ChainCollectionChanged;
             }
         }
 
@@ -179,6 +202,11 @@ namespace Avalonia.Data.Core
         }
 
         private void ChainPropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
+        {
+            PublishValue();
+        }
+
+        private void ChainCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             PublishValue();
         }
