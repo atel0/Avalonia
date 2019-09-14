@@ -22,15 +22,26 @@ namespace Avalonia.Data.Core.Parsers
             return visitor._links;
         }
 
-        public override Expression Visit(Expression node)
+        protected override Expression VisitMember(MemberExpression node)
         {
-            if (node != null && node != _rootExpression)
+            if (node.Expression != null)
             {
-                var link = Expression.Lambda(node, _rootExpression.Parameters);
+                var link = Expression.Lambda(node.Expression, _rootExpression.Parameters);
                 _links.Add(link.Compile());
             }
 
-            return base.Visit(node);
+            return base.VisitMember(node);
+        }
+
+        protected override Expression VisitMethodCall(MethodCallExpression node)
+        {
+            if (node.Object != null)
+            {
+                var link = Expression.Lambda(node.Object, _rootExpression.Parameters);
+                _links.Add(link.Compile());
+            }
+
+            return base.VisitMethodCall(node);
         }
     }
 }
