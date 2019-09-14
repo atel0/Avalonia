@@ -34,5 +34,31 @@ namespace Avalonia.Base.UnitTests.Data.Core
 
             GC.KeepAlive(data);
         }
+
+        [Fact]
+        public void Should_Convert_TwoWay()
+        {
+            var data = new Class1 { Foo = "123" };
+            var target = BindingExpression.TwoWay(
+                data,
+                o => o.Foo,
+                (o, v) => o.Foo = v,
+                x => int.Parse(x),
+                x => x.ToString());
+
+            using (target.Subscribe())
+            {
+                target.OnNext(321);
+
+                Assert.Equal("321", data.Foo);
+            }
+
+            GC.KeepAlive(data);
+        }
+
+        private class Class1
+        {
+            public string Foo { get; set; }
+        }
     }
 }
