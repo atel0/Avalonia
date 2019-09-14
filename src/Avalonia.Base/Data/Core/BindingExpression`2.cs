@@ -26,7 +26,7 @@ namespace Avalonia.Data.Core
             IObservable<TIn> root,
             Func<TIn, TOut> read,
             Action<TIn, TOut>? write,
-            List<Delegate> links)
+            List<Func<TIn, object>> links)
         {
             _rootSource = root;
             _read = read;
@@ -102,14 +102,13 @@ namespace Avalonia.Data.Core
         {
             if (_root != null && _root.TryGetTarget(out var root))
             {
-                var arg = new[] { root };
                 object? last = null;
 
                 try
                 {
                     for (var i = from; i < _chain.Length; ++i)
                     {
-                        var o = _chain[i].Eval.DynamicInvoke(arg);
+                        var o = _chain[i].Eval(root);
 
                         if (o != last)
                         {
@@ -234,13 +233,13 @@ namespace Avalonia.Data.Core
 
         private struct Link
         {
-            public Link(Delegate eval)
+            public Link(Func<TIn, object> eval)
             {
                 Eval = eval;
                 Value = null;
             }
 
-            public Delegate Eval { get; }
+            public Func<TIn, object> Eval { get; }
             public object? Value; // TODO: WeakReference
         }
     }

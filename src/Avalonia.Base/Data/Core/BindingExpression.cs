@@ -25,7 +25,7 @@ namespace Avalonia.Data.Core
                 root,
                 read.Compile(),
                 null,
-                ExpressionChainVisitor.Build(read));
+                ExpressionChainVisitor<TIn>.Build(read));
         }
 
         public static BindingExpression<TIn, TConverted> OneWay<TIn, TOut, TConverted>(
@@ -49,7 +49,7 @@ namespace Avalonia.Data.Core
                 root,
                 x => convert(compiledRead(x)),
                 null,
-                ExpressionChainVisitor.Build(read));
+                ExpressionChainVisitor<TIn>.Build(read));
         }
 
         public static BindingExpression<TIn, TOut> TwoWay<TIn, TOut>(
@@ -71,7 +71,7 @@ namespace Avalonia.Data.Core
                 root,
                 read.Compile(),
                 write,
-                ExpressionChainVisitor.Build(read));
+                ExpressionChainVisitor<TIn>.Build(read));
         }
 
         public static BindingExpression<TIn, TConverted> TwoWay<TIn, TOut, TConverted>(
@@ -99,7 +99,7 @@ namespace Avalonia.Data.Core
                 root,
                 x => convert(compiledRead(x)),
                 (o, v) => write(o, convertBack(v)),
-                ExpressionChainVisitor.Build(read));
+                ExpressionChainVisitor<TIn>.Build(read));
         }
 
         private class Single<T> : IObservable<T>, IDisposable where T : class
