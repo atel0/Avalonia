@@ -8,46 +8,70 @@ namespace Avalonia.Data.Core
 {
     public static class BindingExpression
     {
-        public static BindingExpression<TIn, TOut> Create<TIn, TOut>(
+        public static BindingExpression<TIn, TOut> OneWay<TIn, TOut>(
             TIn root,
-            Expression<Func<TIn, TOut>> expression)
+            Expression<Func<TIn, TOut>> read)
                 where TIn : class
         {
-            return Create(new Single<TIn>(root), expression);
+            return OneWay(new Single<TIn>(root), read);
         }
 
-        public static BindingExpression<TIn, TConverted> Create<TIn, TOut, TConverted>(
-            TIn root,
-            Expression<Func<TIn, TOut>> expression,
-            Func<TOut, TConverted> convert)
-                where TIn : class
-        {
-            return Create(new Single<TIn>(root), expression, convert);
-        }
-
-        public static BindingExpression<TIn, TOut> Create<TIn, TOut>(
+        public static BindingExpression<TIn, TOut> OneWay<TIn, TOut>(
             IObservable<TIn> root,
-            Expression<Func<TIn, TOut>> expression)
+            Expression<Func<TIn, TOut>> read)
                 where TIn : class
         {
             return new BindingExpression<TIn, TOut>(
                 root,
-                expression.Compile(),
-                ExpressionChainVisitor.Build(expression));
+                read.Compile(),
+                null,
+                ExpressionChainVisitor.Build(read));
         }
 
-        public static BindingExpression<TIn, TConverted> Create<TIn, TOut, TConverted>(
-            IObservable<TIn> root,
-            Expression<Func<TIn, TOut>> expression,
+        public static BindingExpression<TIn, TConverted> OneWay<TIn, TOut, TConverted>(
+            TIn root,
+            Expression<Func<TIn, TOut>> read,
             Func<TOut, TConverted> convert)
                 where TIn : class
         {
-            var compiled = expression.Compile();
+            return OneWay(new Single<TIn>(root), read, convert);
+        }
+
+        public static BindingExpression<TIn, TConverted> OneWay<TIn, TOut, TConverted>(
+            IObservable<TIn> root,
+            Expression<Func<TIn, TOut>> read,
+            Func<TOut, TConverted> convert)
+                where TIn : class
+        {
+            var compiled = read.Compile();
 
             return new BindingExpression<TIn, TConverted>(
                 root,
                 x => convert(compiled(x)),
-                ExpressionChainVisitor.Build(expression));
+                null,
+                ExpressionChainVisitor.Build(read));
+        }
+
+        public static BindingExpression<TIn, TOut> TwoWay<TIn, TOut>(
+            TIn root,
+            Expression<Func<TIn, TOut>> read,
+            Action<TIn, TOut> write)
+                where TIn : class
+        {
+            return TwoWay(new Single<TIn>(root), read, write);
+        }
+
+        public static BindingExpression<TIn, TOut> TwoWay<TIn, TOut>(
+            IObservable<TIn> root,
+            Expression<Func<TIn, TOut>> read,
+            Action<TIn, TOut> write)
+                where TIn : class
+        {
+            return new BindingExpression<TIn, TOut>(
+                root,
+                read.Compile(),
+                write,
+                ExpressionChainVisitor.Build(read));
         }
 
         private class Single<T> : IObservable<T>, IDisposable where T : class

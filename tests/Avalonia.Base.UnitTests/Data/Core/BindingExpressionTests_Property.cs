@@ -20,7 +20,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         public async Task Should_Get_Simple_Property_Value()
         {
             var data = new { Foo = "foo" };
-            var target = BindingExpression.Create(data, o => o.Foo);
+            var target = BindingExpression.OneWay(data, o => o.Foo);
             var result = await target.Take(1);
 
             Assert.Equal("foo", result.Value);
@@ -45,7 +45,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         public async Task Should_Get_Simple_Property_Value_Null()
         {
             var data = new { Foo = (string)null };
-            var target = BindingExpression.Create(data, o => o.Foo);
+            var target = BindingExpression.OneWay(data, o => o.Foo);
             var result = await target.Take(1);
 
             Assert.Null(result.Value);
@@ -57,7 +57,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         public async Task Should_Get_Simple_Property_From_Base_Class()
         {
             var data = new Class3 { Foo = "foo" };
-            var target = BindingExpression.Create(data, o => o.Foo);
+            var target = BindingExpression.OneWay(data, o => o.Foo);
             var result = await target.Take(1);
 
             Assert.Equal("foo", result.Value);
@@ -68,7 +68,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         [Fact]
         public void Should_Not_Return_Value_When_Root_Null()
         {
-            var target = BindingExpression.Create(default(Class3), o => o.Foo);
+            var target = BindingExpression.OneWay(default(Class3), o => o.Foo);
             var result = new List<string>();
 
             target.Subscribe(x => result.Add(x.Value));
@@ -123,7 +123,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         public async Task Should_Get_Simple_Property_Chain()
         {
             var data = new { Foo = new { Bar = new { Baz = "baz" } } };
-            var target = BindingExpression.Create(data, o => o.Foo.Bar.Baz);
+            var target = BindingExpression.OneWay(data, o => o.Foo.Bar.Baz);
             var result = await target.Take(1);
 
             Assert.Equal("baz", result.Value);
@@ -170,7 +170,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         public void Should_Track_Simple_Property_Value()
         {
             var data = new Class1 { Foo = "foo" };
-            var target = BindingExpression.Create(data, o => o.Foo);
+            var target = BindingExpression.OneWay(data, o => o.Foo);
             var result = new List<object>();
 
             var sub = target.Subscribe(x => result.Add(x.Value));
@@ -219,7 +219,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         public void Should_Track_End_Of_Property_Chain_Changing()
         {
             var data = new Class1 { Next = new Class2 { Bar = "bar" } };
-            var target = BindingExpression.Create(data, o => (o.Next as Class2).Bar);
+            var target = BindingExpression.OneWay(data, o => (o.Next as Class2).Bar);
             var result = new List<object>();
 
             var sub = target.Subscribe(x => result.Add(x.Value));
@@ -240,7 +240,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         public void Should_Track_Property_Chain_Changing()
         {
             var data = new Class1 { Next = new Class2 { Bar = "bar" } };
-            var target = BindingExpression.Create(data, o => (o.Next as Class2).Bar);
+            var target = BindingExpression.OneWay(data, o => (o.Next as Class2).Bar);
             var result = new List<object>();
 
             var sub = target.Subscribe(x => result.Add(x.Value));
@@ -273,7 +273,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
                 }
             };
 
-            var target = BindingExpression.Create(data, o => ((o.Next as Class2).Next as Class2).Bar);
+            var target = BindingExpression.OneWay(data, o => ((o.Next as Class2).Next as Class2).Bar);
             var result = new List<BindingValue<string>>();
 
             var sub = target.Subscribe(x => result.Add(x));
@@ -299,7 +299,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         public void Should_Track_Property_Chain_Breaking_With_Missing_Member_Then_Mending()
         {
             var data = new Class1 { Next = new Class2 { Bar = "bar" } };
-            var target = BindingExpression.Create(data, o => (o.Next as Class2).Bar);
+            var target = BindingExpression.OneWay(data, o => (o.Next as Class2).Bar);
             var result = new List<BindingValue<string>>();
 
             var sub = target.Subscribe(x => result.Add(x));
@@ -328,7 +328,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         {
             var update = new Subject<Unit>();
             var source = new BehaviorSubject<Class1>(new Class1 { Foo = "foo" });
-            var target = BindingExpression.Create(source, o => o.Foo);
+            var target = BindingExpression.OneWay(source, o => o.Foo);
             var result = new List<string>();
 
             target.Subscribe(x => result.Add(x.Value));
@@ -345,7 +345,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
             var source = scheduler.CreateColdObservable(
                 OnNext(1, new Class1 { Foo = "foo" }),
                 OnNext(2, new Class1 { Foo = "bar" }));
-            var target = BindingExpression.Create(source, o => o.Foo);
+            var target = BindingExpression.OneWay(source, o => o.Foo);
             var result = new List<string>();
 
             using (target.Subscribe(x => result.Add(x.Value)))
@@ -361,7 +361,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         public void Subscribing_Multiple_Times_Should_Return_Values_To_All()
         {
             var data = new Class1 { Foo = "foo" };
-            var target = BindingExpression.Create(data, o => o.Foo);
+            var target = BindingExpression.OneWay(data, o => o.Foo);
             var result1 = new List<string>();
             var result2 = new List<string>();
             var result3 = new List<string>();
@@ -384,7 +384,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         public void Subscribing_Multiple_Times_Should_Only_Add_PropertyChanged_Handlers_Once()
         {
             var data = new Class1 { Foo = "foo" };
-            var target = BindingExpression.Create(data, o => o.Foo);
+            var target = BindingExpression.OneWay(data, o => o.Foo);
 
             var sub1 = target.Subscribe(x => { });
             var sub2 = target.Subscribe(x => { });
@@ -530,7 +530,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
             Func<Tuple<BindingExpression<Class1, string>, WeakReference>> run = () =>
             {
                 var source = new Class1 { Foo = "foo" };
-                var target = BindingExpression.Create(source, o => o.Foo);
+                var target = BindingExpression.OneWay(source, o => o.Foo);
                 return Tuple.Create(target, new WeakReference(source));
             };
 

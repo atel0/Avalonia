@@ -17,7 +17,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         public async Task Should_Get_Attached_Property_Value()
         {
             var data = new Class1();
-            var target = BindingExpression.Create(data, o => o[Owner.FooProperty]);
+            var target = BindingExpression.OneWay(data, o => o[Owner.FooProperty]);
             var result = await target.Take(1);
 
             Assert.Equal("foo", result.Value);
@@ -36,7 +36,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
                 }
             };
 
-            var target = BindingExpression.Create(data, o => o.Next[Owner.FooProperty]);
+            var target = BindingExpression.OneWay(data, o => o.Next[Owner.FooProperty]);
             var result = await target.Take(1);
 
             Assert.Equal("bar", result.Value);
@@ -48,7 +48,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         public void Should_Track_Simple_Attached_Value()
         {
             var data = new Class1();
-            var target = BindingExpression.Create(data, o => o[Owner.FooProperty]);
+            var target = BindingExpression.OneWay(data, o => o[Owner.FooProperty]);
             var result = new List<object>();
 
             var sub = target.Subscribe(x => result.Add(x.Value));
@@ -72,7 +72,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
                 }
             };
 
-            var target = BindingExpression.Create(data, o => o.Next[Owner.FooProperty]);
+            var target = BindingExpression.OneWay(data, o => o.Next[Owner.FooProperty]);
             var result = new List<object>();
 
             var sub = target.Subscribe(x => result.Add(x.Value));

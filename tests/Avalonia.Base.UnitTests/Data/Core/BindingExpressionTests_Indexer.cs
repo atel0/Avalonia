@@ -20,7 +20,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         public async Task Should_Get_Array_Value()
         {
             var data = new { Foo = new[] { "foo", "bar" } };
-            var target = BindingExpression.Create(data, x => x.Foo[1]);
+            var target = BindingExpression.OneWay(data, x => x.Foo[1]);
             var result = await target.Take(1);
 
             Assert.Equal("bar", result.Value);
@@ -32,7 +32,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         public async Task Should_Get_MultiDimensional_Array_Value()
         {
             var data = new { Foo = new[,] { { "foo", "bar" }, { "baz", "qux" } } };
-            var target = BindingExpression.Create(data, o => o.Foo[1, 1]);
+            var target = BindingExpression.OneWay(data, o => o.Foo[1, 1]);
             var result = await target.Take(1);
 
             Assert.Equal("qux", result.Value);
@@ -44,7 +44,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         public async Task Should_Get_Value_For_String_Indexer()
         {
             var data = new { Foo = new Dictionary<string, string> { { "foo", "bar" }, { "baz", "qux" } } };
-            var target = BindingExpression.Create(data, o => o.Foo["foo"]);
+            var target = BindingExpression.OneWay(data, o => o.Foo["foo"]);
             var result = await target.Take(1);
 
             Assert.Equal("bar", result.Value);
@@ -56,7 +56,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         public async Task Should_Get_Value_For_Non_String_Indexer()
         {
             var data = new { Foo = new Dictionary<double, string> { { 1.0, "bar" }, { 2.0, "qux" } } };
-            var target = BindingExpression.Create(data, o => o.Foo[1.0]);
+            var target = BindingExpression.OneWay(data, o => o.Foo[1.0]);
             var result = await target.Take(1);
 
             Assert.Equal("bar", result.Value);
@@ -68,7 +68,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         public async Task Array_Out_Of_Bounds_Should_Return_Error()
         {
             var data = new { Foo = new[] { "foo", "bar" } };
-            var target = BindingExpression.Create(data, o => o.Foo[2]);
+            var target = BindingExpression.OneWay(data, o => o.Foo[2]);
             var result = await target.Take(1);
 
             Assert.IsType<IndexOutOfRangeException>(result.Error);
@@ -80,7 +80,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         public async Task List_Out_Of_Bounds_Should_Return_Error()
         {
             var data = new { Foo = new List<string> { "foo", "bar" } };
-            var target = BindingExpression.Create(data, o => o.Foo[2]);
+            var target = BindingExpression.OneWay(data, o => o.Foo[2]);
             var result = await target.Take(1);
 
             Assert.IsType<ArgumentOutOfRangeException>(result.Error);
@@ -92,7 +92,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         public async Task Should_Get_List_Value()
         {
             var data = new { Foo = new List<string> { "foo", "bar" } };
-            var target = BindingExpression.Create(data, o => o.Foo[1]);
+            var target = BindingExpression.OneWay(data, o => o.Foo[1]);
             var result = await target.Take(1);
 
             Assert.Equal("bar", result.Value);
@@ -104,7 +104,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         public void Should_Track_INCC_Add()
         {
             var data = new { Foo = new AvaloniaList<string> { "foo", "bar" } };
-            var target = BindingExpression.Create(data, o => o.Foo[2]);
+            var target = BindingExpression.OneWay(data, o => o.Foo[2]);
             var result = new List<BindingValue<string>>();
 
             using (var sub = target.Subscribe(x => result.Add(x)))
@@ -123,7 +123,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         public void Should_Track_INCC_Remove()
         {
             var data = new { Foo = new AvaloniaList<string> { "foo", "bar" } };
-            var target = BindingExpression.Create(data, o => o.Foo[0]);
+            var target = BindingExpression.OneWay(data, o => o.Foo[0]);
             var result = new List<string>();
 
             using (var sub = target.Subscribe(x => result.Add(x.Value)))
@@ -142,7 +142,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         public void Should_Track_INCC_Replace()
         {
             var data = new { Foo = new AvaloniaList<string> { "foo", "bar" } };
-            var target = BindingExpression.Create(data, o => o.Foo[1]);
+            var target = BindingExpression.OneWay(data, o => o.Foo[1]);
             var result = new List<string>();
 
             using (var sub = target.Subscribe(x => result.Add(x.Value)))
@@ -163,7 +163,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
             // method, but even if it did we need to test with ObservableCollection as well
             // as AvaloniaList as it implements PropertyChanged as an explicit interface event.
             var data = new { Foo = new ObservableCollection<string> { "foo", "bar" } };
-            var target = BindingExpression.Create(data, o => o.Foo[1]);
+            var target = BindingExpression.OneWay(data, o => o.Foo[1]);
             var result = new List<string>();
 
             var sub = target.Subscribe(x => result.Add(x.Value));
@@ -180,7 +180,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         public void Should_Track_INCC_Reset()
         {
             var data = new { Foo = new AvaloniaList<string> { "foo", "bar" } };
-            var target = BindingExpression.Create(data, o => o.Foo[1]);
+            var target = BindingExpression.OneWay(data, o => o.Foo[1]);
             var result = new List<BindingValue<string>>();
 
             var sub = target.Subscribe(x => result.Add(x));
@@ -200,7 +200,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
             data.Foo["foo"] = "bar";
             data.Foo["baz"] = "qux";
 
-            var target = BindingExpression.Create(data, o => o.Foo["foo"]);
+            var target = BindingExpression.OneWay(data, o => o.Foo["foo"]);
             var result = new List<string>();
 
             using (var sub = target.Subscribe(x => result.Add(x.Value)))
@@ -299,7 +299,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         {
             var data = new[] { 1, 2, 3 };
 
-            var target = BindingExpression.Create(data, o => o[1]);
+            var target = BindingExpression.OneWay(data, o => o[1]);
 
             var value = await target.Take(1);
 

@@ -22,7 +22,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         public async Task Should_Get_Simple_Property_Value()
         {
             var data = new Class1();
-            var target = BindingExpression.Create(data, o => o.Foo);
+            var target = BindingExpression.OneWay(data, o => o.Foo);
             var result = await target.Take(1);
 
             Assert.Equal("foo", result.Value);
@@ -34,7 +34,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         public async Task Should_Get_Simple_ClrProperty_Value()
         {
             var data = new Class1();
-            var target = BindingExpression.Create(data, o => o.ClrProperty);
+            var target = BindingExpression.OneWay(data, o => o.ClrProperty);
             var result = await target.Take(1);
 
             Assert.Equal("clr-property", result.Value);
@@ -44,7 +44,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         public void Should_Track_Simple_Property_Value()
         {
             var data = new Class1();
-            var target = BindingExpression.Create(data, o => o.Foo);
+            var target = BindingExpression.OneWay(data, o => o.Foo);
             var result = new List<string>();
 
             var sub = target.Subscribe(x => result.Add(x.Value));

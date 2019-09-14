@@ -16,7 +16,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         {
             var target = new object();
 
-            var observer = BindingExpression.Create(target, o => o);
+            var observer = BindingExpression.OneWay(target, o => o);
             
             Assert.Same(target, (await observer.Take(1)).Value);
             GC.KeepAlive(target);
@@ -27,7 +27,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         {
             var target = new Class1();
 
-            var observer = BindingExpression.Create(target, o => o.Foo);
+            var observer = BindingExpression.OneWay(target, o => o.Foo);
 
             Assert.Null((await observer.Take(1)).Value);
 
@@ -60,7 +60,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         {
             var data = new[] { 1, 2, 3, 4 };
 
-            var target = BindingExpression.Create(data, o => o[0]);
+            var target = BindingExpression.OneWay(data, o => o[0]);
 
             Assert.Equal(data[0], (await target.Take(1)).Value);
             GC.KeepAlive(data);
@@ -71,7 +71,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         {
             var data = new List<int> { 1, 2, 3, 4 };
 
-            var target = BindingExpression.Create(data, o => o[0]);
+            var target = BindingExpression.OneWay(data, o => o[0]);
 
             Assert.Equal(data[0], (await target.Take(1)).Value);
             GC.KeepAlive(data);
@@ -86,7 +86,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
 
             data.Add(key, new object());
 
-            var target = BindingExpression.Create(data, o => o[key]);
+            var target = BindingExpression.OneWay(data, o => o[key]);
 
             Assert.Equal(data[key], (await target.Take(1)).Value);
 
@@ -113,7 +113,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         {
             NotifyingBase test = new Class1 { Foo = "Test" };
 
-            var target = BindingExpression.Create(test, o => ((Class1)o).Foo);
+            var target = BindingExpression.OneWay(test, o => ((Class1)o).Foo);
 
             Assert.Equal("Test", (await target.Take(1)).Value);
 
@@ -145,7 +145,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         {
             var test = new Class2();
 
-            var target = BindingExpression.Create(test, o => o[Class2.FooProperty]);
+            var target = BindingExpression.OneWay(test, o => o[Class2.FooProperty]);
 
             Assert.Equal("foo", (await target.Take(1)).Value);
 
@@ -157,7 +157,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         {
             var test = new Class1 { Foo = "Test" };
 
-            var target = BindingExpression.Create(test, o => o.Foo.Length);
+            var target = BindingExpression.OneWay(test, o => o.Foo.Length);
 
             Assert.Equal(test.Foo.Length, (await target.Take(1)).Value);
 
@@ -169,7 +169,7 @@ namespace Avalonia.Base.UnitTests.Data.Core
         {
             var test = new Class1 { Foo = "Test" };
 
-            var target = BindingExpression.Create(test, o => o.Foo == "Test" ? 5 : 6);
+            var target = BindingExpression.OneWay(test, o => o.Foo == "Test" ? 5 : 6);
 
             Assert.Equal(5, (await target.Take(1)).Value);
 

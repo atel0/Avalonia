@@ -10,23 +10,27 @@ using Avalonia.Reactive;
 namespace Avalonia.Data.Core
 {
     public class BindingExpression<TIn, TOut> : LightweightObservableBase<BindingValue<TOut>>,
-        ISubject<TIn, BindingValue<TOut>>,
+        ISubject<TOut, BindingValue<TOut>>,
         IDescription
             where TIn : class
     {
         private readonly IObservable<TIn> _rootSource;
         private readonly Func<TIn, TOut> _read;
+        private readonly Action<TIn, TOut>? _write;
         private readonly Link[] _chain;
         private IDisposable? _rootSourceSubsciption;
         private WeakReference<TIn>? _root;
+        private int _publishCount;
 
         public BindingExpression(
             IObservable<TIn> root,
             Func<TIn, TOut> read,
+            Action<TIn, TOut>? write,
             List<Delegate> links)
         {
             _rootSource = root;
             _read = read;
+            _write = write;
             _chain = new Link[links.Count];
 
             for (var i = 0; i < links.Count; ++i)
@@ -37,15 +41,31 @@ namespace Avalonia.Data.Core
 
         public string Description => "TODO";
 
-        void IObserver<TIn>.OnCompleted()
+        public void OnNext(TOut value)
+        {
+            if (_write != null && _root != null && _root.TryGetTarget(out var root))
+            {
+                try
+                {
+                    var c = _publishCount;
+                    _write.Invoke(root, value);
+                    if (_publishCount == c)
+                        PublishValue();
+                }
+                catch
+                {
+                    PublishValue();
+                }
+            }
+        }
+
+        void IObserver<TOut>.OnCompleted()
         {
         }
 
-        void IObserver<TIn>.OnError(Exception error)
+        void IObserver<TOut>.OnError(Exception error)
         {
         }
-
-        void IObserver<TIn>.OnNext(TIn value) => throw new NotImplementedException();
 
         protected override void Initialize()
         {
@@ -56,6 +76,7 @@ namespace Avalonia.Data.Core
         {
             StopListeningToChain(0);
             _rootSourceSubsciption?.Dispose();
+            _rootSourceSubsciption = null;
         }
 
         protected override void Subscribed(IObserver<BindingValue<TOut>> observer, bool first)
@@ -191,6 +212,7 @@ namespace Avalonia.Data.Core
             if (_root != null && _root.TryGetTarget(out var root))
             {
                 var result = GetResult(root);
+                unchecked { ++_publishCount; }
                 PublishNext(result);
             }
         }
