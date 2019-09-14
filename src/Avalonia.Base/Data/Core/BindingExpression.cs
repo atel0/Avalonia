@@ -2,6 +2,8 @@
 using System.Linq.Expressions;
 using Avalonia.Data.Core.Parsers;
 
+#nullable enable
+
 namespace Avalonia.Data.Core
 {
     public static class BindingExpression
@@ -14,6 +16,15 @@ namespace Avalonia.Data.Core
             return Create(new Single<TIn>(root), expression);
         }
 
+        public static BindingExpression<TIn, TConverted> Create<TIn, TOut, TConverted>(
+            TIn root,
+            Expression<Func<TIn, TOut>> expression,
+            Func<TOut, TConverted> convert)
+                where TIn : class
+        {
+            return Create(new Single<TIn>(root), expression, convert);
+        }
+
         public static BindingExpression<TIn, TOut> Create<TIn, TOut>(
             IObservable<TIn> root,
             Expression<Func<TIn, TOut>> expression)
@@ -22,6 +33,20 @@ namespace Avalonia.Data.Core
             return new BindingExpression<TIn, TOut>(
                 root,
                 expression.Compile(),
+                ExpressionChainVisitor.Build(expression));
+        }
+
+        public static BindingExpression<TIn, TConverted> Create<TIn, TOut, TConverted>(
+            IObservable<TIn> root,
+            Expression<Func<TIn, TOut>> expression,
+            Func<TOut, TConverted> convert)
+                where TIn : class
+        {
+            var compiled = expression.Compile();
+
+            return new BindingExpression<TIn, TConverted>(
+                root,
+                x => convert(compiled(x)),
                 ExpressionChainVisitor.Build(expression));
         }
 

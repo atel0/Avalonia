@@ -6,13 +6,11 @@ using System.Collections.Generic;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using Microsoft.Reactive.Testing;
-using Avalonia.Data;
+using System.Threading.Tasks;
 using Avalonia.Data.Core;
 using Avalonia.UnitTests;
+using Microsoft.Reactive.Testing;
 using Xunit;
-using System.Threading.Tasks;
-using Avalonia.Markup.Parsers;
 
 namespace Avalonia.Base.UnitTests.Data.Core
 {
